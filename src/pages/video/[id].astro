@@ -1,0 +1,72 @@
+---
+import Layout from "../../layouts/Layout.astro";
+const { id } = Astro.params;
+
+let video: any = {};
+try {
+  const res = await fetch(`${import.meta.env.PUBLIC_API_URL}/v/${id}`);
+  video = (await res.json()) || {};
+  video.playlist = import.meta.env.PUBLIC_API_URL + video.playlist;
+  video.vttTrack = import.meta.env.PUBLIC_API_URL + video.vttTrack;
+  video.poster = import.meta.env.PUBLIC_API_URL + video.thumbnail.large;
+} catch (e) {
+  console.error(e);
+  video = {};
+}
+---
+
+<Layout title="Player">
+  <main>
+    <h1>{video.title}</h1>
+    <div
+      id="player"
+      data-poster={video.poster}
+      data-url={video.playlist}
+      data-vtttrack={video.vttTrack}
+      data-title={video.title}
+    >
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import { Player } from "@oplayer/core";
+  import OUI from "@oplayer/ui";
+  import hls from "@oplayer/hls";
+  import dash from "@oplayer/dash";
+  import { Chromecast, vttThumbnails } from "@oplayer/plugins";
+
+  const $player = document.getElementById("player");
+  if (!$player) throw new Error("No video player id");
+
+  const { url, poster, vtttrack, title } = $player.dataset;
+
+  const player = Player.make("#player", {
+    source: {
+      title: title!,
+      src: url!,
+      poster: poster!,
+    },
+  })
+    .use([
+      OUI(),
+      vttThumbnails({ src: vtttrack! }),
+      dash({ withBitrate: true }),
+      hls({ forceHLS: true, withBitrate: true }),
+      // Chromecast,
+    ])
+    .create();
+  console.log(player);
+</script>
+
+<style>
+  #player {
+    max-width: 900px;
+    margin: auto;
+    width: 100%;
+  }
+  h1 {
+    color: white;
+    text-align: center;
+  }
+</style>

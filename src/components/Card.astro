@@ -1,0 +1,53 @@
+---
+import { toHHMMSS } from '../utils';
+
+interface Props {
+	title: string;
+	time: string;
+	image: string;
+  href: string;
+}
+
+const { href, title, image, time } = Astro.props;
+---
+
+<a href={href} class="video-item">
+  <div class="video-img">
+    <img src={`${import.meta.env.PUBLIC_API_URL}${image}`} alt="video thumbnail" />
+    <span class="video-time">{toHHMMSS(time)}</span>
+  </div>
+  <p>{title}</p>
+</a>
+
+<style>
+	.video-item {
+    display: block;
+    color: white;
+  }
+  .video-img {
+    position: relative;
+    overflow: hidden;
+  }
+  .video-img img {
+    width: 100%;
+    display: block;
+  }
+  .video-time {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+  p {
+    margin: 0.5rem 0;
+    font-size: 1.3rem;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+</style>

@@ -1,0 +1,62 @@
+---
+import Card from '../components/Card.astro';
+import Layout from '../layouts/Layout.astro';
+
+let videos = [];
+try {
+  const res = await fetch(`${import.meta.env.PUBLIC_API_URL}/v`);
+  videos = (await res.json()).videos || [];
+}catch(e) {
+  console.error(e);
+  videos = [];
+}
+---
+
+<Layout title="Welcome to Astro.">
+	<main>
+		
+		<h1>Videos <span class="text-gradient">Fun</span></h1>
+		
+		<div class="video-list">
+      {videos.map((video:any) => (
+        <Card 
+          title={video.title} 
+          image={video.thumbnail.large} 
+          time={video.duration} 
+          href={`/video/${video.id}`} 
+        />
+      ))}
+    </div>
+	</main>
+</Layout>
+
+<style>
+	main {
+		margin: auto;
+		padding: 1rem;
+		width: 800px;
+		max-width: calc(100% - 2rem);
+		color: white;
+		font-size: 20px;
+		line-height: 1.6;
+	}
+	h1 {
+		font-size: 4rem;
+		font-weight: 700;
+		line-height: 1;
+		text-align: center;
+		margin-bottom: 1em;
+	}
+	.text-gradient {
+		background-image: var(--accent-gradient);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-size: 400%;
+		background-position: 0%;
+	}
+  .video-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+</style>
